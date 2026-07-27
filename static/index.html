@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="screen-orientation" content="auto">
+<meta name="x5-orientation" content="auto">
+<title>智慧体育课堂监测平台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--p:#4facfe;--p2:#00f2fe;--bg:#f0f2f5;--card:#fff;--text:#1a1a2e;--sub:#8b8ba0;--r:14px;--sh:0 2px 12px rgba(0,0,0,.08);--danger:#ff4757;--safe:#00d8a0;--warn:#ff9f43}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:64px}
+.header{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:18px 16px 14px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.12);transition:background .4s}
+.header-row{display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:18px;font-weight:700}
+.header .sub{font-size:11px;opacity:.85;margin-top:2px}
+.scene-bar{display:flex;gap:6px;margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.scene-bar::-webkit-scrollbar{display:none}
+.scene-btn{flex-shrink:0;padding:6px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.scene-btn.active{background:#fff;color:var(--p);border-color:#fff;font-weight:700}
+.page{display:none;padding:12px}
+.page.active{display:block;animation:fi .3s}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-item{background:linear-gradient(135deg,#f8f9ff,#eef1f8);border-radius:10px;padding:12px 8px;text-align:center}
+.stat-num{font-size:22px;font-weight:800;color:var(--p);line-height:1.1}
+.stat-num.sm{font-size:16px}
+.stat-label{font-size:10px;color:var(--sub);margin-top:3px}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.btn-p:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-g{background:#eef1f8;color:var(--text)}
+.btn-d{background:var(--danger);color:#fff}
+.upload-zone{border:2px dashed #c5cdda;border-radius:var(--r);padding:32px 16px;text-align:center;cursor:pointer;transition:all .2s;background:#fafbfe}
+.upload-zone:active{border-color:var(--p);background:#f0f7ff}
+.upload-icon{font-size:42px;margin-bottom:8px}
+.switch-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.switch-label{font-size:13px;font-weight:600}
+.switch{position:relative;width:44px;height:24px;background:#ccc;border-radius:12px;cursor:pointer;transition:.3s}
+.switch.on{background:var(--p)}
+.switch::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.switch.on::after{left:22px}
+.prog-bar{width:100%;height:6px;background:#e8ecf2;border-radius:3px;overflow:hidden;margin:10px 0}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--p),var(--p2));border-radius:3px;transition:width .3s;width:0%}
+.dist-item{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid #f0f2f5;font-size:12px}
+.dist-item:last-child{border-bottom:none}
+.dist-bar{flex:1;height:5px;background:#e8ecf2;border-radius:3px;margin:0 10px;overflow:hidden}
+.dist-fill{height:100%;background:var(--p);border-radius:3px}
+.rec-item{background:var(--card);border-radius:var(--r);padding:12px;margin-bottom:8px;box-shadow:var(--sh);cursor:pointer;transition:all .15s}
+.rec-item:active{transform:scale(.98)}
+.rec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.rec-time{font-size:11px;color:var(--sub)}
+.rec-tag{font-size:10px;padding:2px 7px;border-radius:8px;background:#eef1f8;color:var(--p);font-weight:600}
+.rec-stats{display:flex;gap:12px;font-size:11px;color:var(--sub)}
+.rec-stats b{color:var(--text);font-size:13px}
+.video-player{width:100%;border-radius:10px;margin:8px 0;background:#000}
+.empty{text-align:center;padding:30px 16px;color:var(--sub)}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;background:#fff;border-top:1px solid #e8ecf2;display:flex;z-index:200;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.tab{flex:1;padding:6px 0;text-align:center;cursor:pointer;transition:all .15s}
+.tab-icon{font-size:20px;line-height:1}
+.tab-label{font-size:9px;color:var(--sub);margin-top:1px}
+.tab.active .tab-label{color:var(--p);font-weight:700}
+.tab.active .tab-icon{transform:scale(1.15)}
+.back-btn{display:inline-flex;align-items:center;gap:3px;font-size:13px;color:var(--p);cursor:pointer;margin-bottom:10px;font-weight:600}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f2f5;font-size:12px}
+.detail-row:last-child{border-bottom:none}
+.badge{display:inline-block;background:var(--danger);color:#fff;font-size:9px;padding:1px 5px;border-radius:6px;margin-left:3px}
+/* 实时监测 */
+.rt-container{position:relative;border-radius:var(--r);overflow:hidden;background:#000;box-shadow:var(--sh);width:100%;aspect-ratio:4/3}
+@media (orientation:landscape){.rt-container{aspect-ratio:16/9;max-height:75vh}}
+.rt-video{width:100%;height:100%;display:block;object-fit:cover;position:absolute;top:0;left:0}
+.rt-canvas{display:none}
+.rt-overlay{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.rt-badge{position:absolute;top:8px;left:8px;background:rgba(255,0,0,.85);color:#fff;font-size:10px;padding:3px 8px;border-radius:6px;font-weight:700;z-index:3;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.5}}
+.rt-controls{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:3}
+.rt-btn{padding:8px 20px;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.rt-btn:active{transform:scale(.95)}
+.rt-live{background:var(--danger);color:#fff}
+.rt-stop{background:rgba(0,0,0,.7);color:#fff}
+.rt-panel{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);color:#fff;border-radius:10px;padding:8px 10px;font-size:11px;z-index:3;min-width:100px;backdrop-filter:blur(4px)}
+.rt-panel .row{display:flex;justify-content:space-between;margin:2px 0}
+.rt-panel .val{font-weight:700;color:var(--safe)}
+.rt-panel .val.alert{color:var(--danger)}
+/* 场景特色卡 */
+.feat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.feat-card{background:linear-gradient(135deg,var(--p)15,var(--p2)15);border:1px solid var(--p)30;border-radius:10px;padding:10px;text-align:center;transition:all .2s}
+.feat-card:active{transform:scale(.96)}
+.feat-icon{font-size:28px;margin-bottom:4px}
+.feat-name{font-size:12px;font-weight:700}
+.feat-desc{font-size:10px;color:var(--sub);margin-top:2px}
+/* 快捷入口 */
+.quick-row{display:flex;gap:10px;margin-bottom:12px}
+.quick-card{flex:1;background:var(--card);border-radius:var(--r);padding:16px 10px;text-align:center;cursor:pointer;box-shadow:var(--sh);transition:all .2s;border:2px solid transparent}
+.quick-card:active{transform:scale(.96);border-color:var(--p)}
+.quick-icon{font-size:32px}
+.quick-name{font-size:12px;font-weight:700;margin-top:4px}
+.quick-desc{font-size:10px;color:var(--sub);margin-top:2px}
+/* QR */
+#qr-card img{width:160px;height:160px;border-radius:10px;display:block;margin:0 auto}
+/* 登录页 */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--p),var(--p2))}
+.auth-card{background:#fff;border-radius:20px;padding:30px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.auth-logo{text-align:center;font-size:48px;margin-bottom:6px}
+.auth-title{text-align:center;font-size:20px;font-weight:800;margin-bottom:4px;color:var(--text)}
+.auth-sub{text-align:center;font-size:12px;color:var(--sub);margin-bottom:20px}
+.auth-tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid #f0f2f5}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.auth-tab.active{color:var(--p);border-color:var(--p)}
+.auth-form{display:none}
+.auth-form.active{display:block}
+.input-group{margin-bottom:12px}
+.input-label{font-size:12px;font-weight:600;color:var(--sub);margin-bottom:4px;display:block}
+.input-field{width:100%;padding:12px 14px;border:1.5px solid #e0e4ec;border-radius:10px;font-size:14px;transition:.2s;outline:none}
+.input-field:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(79,172,254,.1)}
+.auth-err{color:var(--danger);font-size:12px;margin-top:8px;min-height:16px}
+.auth-hint{font-size:11px;color:var(--sub);margin-top:12px;text-align:center;line-height:1.6}
+/* 用户栏 */
+.user-bar{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:16px;cursor:pointer;transition:.2s}
+.user-bar:active{transform:scale(.95)}
+.user-avatar{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.user-name{font-size:12px;font-weight:600;color:#fff;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- ===== 登录/注册页 ===== -->
+<div class="auth-page" id="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">🎓</div>
+    <div class="auth-title">智慧体育课堂监测</div>
+    <div class="auth-sub">登录后即可使用专属存储空间</div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuthTab('login')">登录</div>
+      <div class="auth-tab" onclick="switchAuthTab('register')">注册</div>
+    </div>
+    <!-- 登录表单 -->
+    <div class="auth-form active" id="form-login">
+      <div class="input-group">
+        <label class="input-label">用户名</label>
+        <input type="text" class="input-field" id="login-user" placeholder="请输入用户名" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label class="input-label">密码</label>
+        <input type="password" class="input-field" id="login-pass" placeholder="请输入密码" autocomplete="current-password">
+      </div>
+      <div class="auth-err" id="login-err"></div>
+      <button class="btn btn-p" style="margin-top:8px" onclick="doLogin()">登 录</button>
+    </div>
+    <!-- 注册表单 -->
+    <div class="auth-form" id="form-register">
+      <div class="input-group">
+        <label class="input-label">用户名</label>
+        <input type="text" class="input-field" id="reg-user" placeholder="至少2个字符" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label class="input-label">昵称（选填）</label>
+        <input type="text" class="input-field" id="reg-name" placeholder="显示名称">
+      </div>
+      <div class="input-group">
+        <label class="input-label">密码</label>
+        <input type="password" class="input-field" id="reg-pass" placeholder="至少4个字符" autocomplete="new-password">
+      </div>
+      <div class="auth-err" id="reg-err"></div>
+      <button class="btn btn-p" style="margin-top:8px" onclick="doRegister()">注 册</button>
+    </div>
+    <div class="auth-hint">
+      每个账号拥有独立的视频存储空间<br>互不干扰，数据隔离
+    </div>
+  </div>
+</div>
+
+<!-- ===== 主应用（登录后显示）===== -->
+<div id="app-main" style="display:none">
+
+<div class="header" id="header">
+  <div class="header-row">
+    <div>
+      <h1 id="app-title">🎓 智慧体育课堂监测</h1>
+      <div class="sub" id="app-sub">课堂质量监测 · 学生安全防护</div>
+    </div>
+    <div class="user-bar" onclick="showLogoutMenu()">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <div class="user-name" id="user-name">用户</div>
+    </div>
+  </div>
+  <div class="scene-bar" id="scene-bar"></div>
+</div>
+
+<!-- ===== 首页 ===== -->
+<div class="page active" id="page-home">
+  <div class="card">
+    <div class="card-title">📊 平台概览</div>
+    <div class="stat-grid-4">
+      <div class="stat-item"><div class="stat-num" id="s-sessions">0</div><div class="stat-label">监测次数</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-frames">0</div><div class="stat-label">处理帧数</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-alerts" style="color:var(--danger)">0</div><div class="stat-label">风险告警</div></div>
+      <div class="stat-item"><div class="stat-num" id="s-part" style="color:var(--safe)">0%</div><div class="stat-label">平均参与度</div></div>
+    </div>
+  </div>
+
+  <div class="quick-row">
+    <div class="quick-card" onclick="showPage('realtime')">
+      <div class="quick-icon">📹</div>
+      <div class="quick-name">实时监测</div>
+      <div class="quick-desc">摄像头实时分析</div>
+    </div>
+    <div class="quick-card" onclick="showPage('video')">
+      <div class="quick-icon">🎬</div>
+      <div class="quick-name">视频分析</div>
+      <div class="quick-desc">上传视频分析</div>
+    </div>
+    <div class="quick-card" onclick="showPage('stats')">
+      <div class="quick-icon">📈</div>
+      <div class="quick-name">数据统计</div>
+      <div class="quick-desc">趋势分析</div>
+    </div>
+  </div>
+
+  <div class="card" id="scene-features-card">
+    <div class="card-title" id="feat-title">🎯 校园体育 · 检测能力</div>
+    <div class="feat-grid" id="feat-grid"></div>
+  </div>
+
+  <div class="card" id="qr-card" style="display:none">
+    <div class="card-title">📱 手机扫码访问</div>
+    <img id="qr-img" src="" alt="二维码">
+    <div style="text-align:center;margin-top:6px;font-size:10px;color:var(--sub)">任意网络均可扫码访问</div>
+    <div id="pub-url" style="text-align:center;margin-top:4px;font-size:10px;color:var(--p);word-break:break-all"></div>
+  </div>
+</div>
+
+<!-- ===== 实时监测 ===== -->
+<div class="page" id="page-realtime">
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="rt-container">
+      <video id="rt-video" class="rt-video" autoplay playsinline muted></video>
+      <canvas id="rt-canvas" class="rt-canvas"></canvas>
+      <img id="rt-overlay" class="rt-overlay" style="display:none">
+      <div class="rt-badge" id="rt-badge" style="display:none">● LIVE</div>
+      <div class="rt-panel" id="rt-panel" style="display:none">
+        <div class="row"><span>人数</span><span class="val" id="rt-total">0</span></div>
+        <div class="row"><span>FPS</span><span class="val" id="rt-fps">0</span></div>
+        <div class="row"><span>参与度</span><span class="val" id="rt-part">0%</span></div>
+        <div class="row"><span>告警</span><span class="val alert" id="rt-alerts">0</span></div>
+        <div class="row"><span>时长</span><span class="val" id="rt-dur">0s</span></div>
+      </div>
+      <div class="rt-controls" id="rt-controls">
+        <button class="rt-btn rt-live" id="rt-start-btn" onclick="startRealtime()">📹 开始实时监测</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚙️ 监测设置</div>
+    <div id="rt-scene-info" style="margin-bottom:8px"></div>
+    <div class="switch-row">
+      <span class="switch-label">启用 BlazePose 精细分析</span>
+      <div class="switch on" id="rt-bp-sw" onclick="rtBP=!rtBP;this.classList.toggle('on',rtBP)"></div>
+    </div>
+    <div class="switch-row">
+      <span class="switch-label">前后摄像头（手机）</span>
+      <div class="switch" id="rt-cam-sw" onclick="toggleCamera()"></div>
+    </div>
+    <div style="font-size:11px;color:var(--sub);margin-top:4px;line-height:1.6">
+      · 点击开始后浏览器会请求摄像头权限<br>
+      · 手机端建议使用后置摄像头，横屏效果更佳<br>
+      · 实时分析帧率取决于网络和设备性能<br>
+      · 如需更高精度请使用视频文件分析
+    </div>
+    <div style="margin-top:8px;padding:8px 12px;background:#fff8e1;border-radius:10px;font-size:11px;color:#8d6e63;line-height:1.7">
+      💡 <b>温馨提示</b>：实时监测每秒约3-8帧，画面会有轻微延迟属正常现象。视频需传到服务器AI分析后返回，公网访问延迟会更高。
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 实时状态 <span id="rt-scene-tag" style="font-size:11px;font-weight:400;color:var(--sub)"></span></div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-num sm" id="rt-moving">0</div><div class="stat-label" id="rt-l-moving">运动中</div></div>
+      <div class="stat-item"><div class="stat-num sm" id="rt-standing">0</div><div class="stat-label" id="rt-l-standing">站立中</div></div>
+      <div class="stat-item"><div class="stat-num sm" id="rt-still">0</div><div class="stat-label" id="rt-l-still">静止</div></div>
+      <div class="stat-item"><div class="stat-num sm" id="rt-peak">0</div><div class="stat-label" id="rt-l-peak">峰值人数</div></div>
+    </div>
+    <div id="rt-extra-metrics" style="margin-top:8px;font-size:12px;color:var(--sub);display:none"></div>
+    <div style="margin-top:8px;font-size:12px;color:var(--sub)">
+      <div id="rt-action-row">🏃 <span id="rt-l-action">动作</span>: <span id="rt-actions" style="color:var(--text);font-weight:600">无</span></div>
+      <div style="margin-top:3px" id="rt-behavior-row">👤 <span id="rt-l-behavior">行为</span>: <span id="rt-behaviors" style="color:var(--text);font-weight:600">无</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视频分析 ===== -->
+<div class="page" id="page-video">
+  <div class="card">
+    <div class="card-title">🎬 视频文件分析</div>
+    <div id="vid-scene-info" style="margin-bottom:8px"></div>
+    <div class="upload-zone" onclick="document.getElementById('vid-input').click()">
+      <div class="upload-icon">📁</div>
+      <div style="font-size:14px;font-weight:600">点击选择视频文件</div>
+      <div style="font-size:11px;color:var(--sub);margin-top:4px">支持 MP4 / MOV / AVI / MKV</div>
+    </div>
+    <input type="file" id="vid-input" accept="video/*" style="display:none" onchange="onVideoSelected(this)">
+    <div class="switch-row" style="margin-top:10px">
+      <span class="switch-label">启用 BlazePose 精细分析</span>
+      <div class="switch on" id="vid-bp-sw" onclick="vidBP=!vidBP;this.classList.toggle('on',vidBP)"></div>
+    </div>
+    <div id="vid-info" style="display:none;margin-top:8px;padding:10px;background:#f0f7ff;border-radius:8px;font-size:12px"></div>
+    <button class="btn btn-p" id="vid-start" style="margin-top:10px" disabled onclick="startVideoAnalysis()">开始分析</button>
+    <div style="margin-top:10px;padding:10px 12px;background:#fff8e1;border-radius:10px;font-size:11px;color:#8d6e63;line-height:1.7">
+      💡 <b>温馨提示</b><br>
+      · 视频分析需要上传到服务器处理，时长取决于视频大小和网络速度<br>
+      · 1分钟视频约需2-5分钟分析，请耐心等待<br>
+      · 分析过程中可以切换到其他页面查看，不会中断分析<br>
+      · 分析完成后会自动跳转结果页，底部导航栏会显示进度提示
+    </div>
+  </div>
+
+  <div class="card" id="vid-prog-card" style="display:none">
+    <div class="card-title">⏳ 分析进度 <span id="vid-prog-status" style="font-size:11px;font-weight:400;color:var(--sub);float:right">处理中</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="vid-prog-fill"></div></div>
+    <div style="text-align:center;font-size:12px;color:var(--sub)" id="vid-prog-text">0%</div>
+    <div style="text-align:center;font-size:11px;color:var(--sub);margin-top:4px" id="vid-prog-detail"></div>
+    <div style="margin-top:8px;font-size:11px;color:var(--sub);text-align:center">
+      ⏱ 分析进行中，您可以切换其他页面查看，不会中断
+    </div>
+  </div>
+</div>
+
+<!-- ===== 视频结果 ===== -->
+<div class="page" id="page-result">
+  <div class="back-btn" onclick="showPage('video')">← 返回</div>
+  <div class="card">
+    <div class="card-title">📈 分析结果</div>
+    <div class="stat-grid-4" id="result-grid"></div>
+  </div>
+  <div class="card" id="result-video-card" style="display:none">
+    <div class="card-title">🎥 结果视频</div>
+    <video class="video-player" id="result-video" controls playsinline></video>
+  </div>
+  <div class="card" id="result-action-card" style="display:none">
+    <div class="card-title">🏃 运动动作识别</div>
+    <div id="result-action-list"></div>
+  </div>
+  <div class="card" id="result-behavior-card" style="display:none">
+    <div class="card-title">👤 行为识别</div>
+    <div id="result-behavior-list"></div>
+  </div>
+</div>
+
+<!-- ===== 统计面板 ===== -->
+<div class="page" id="page-stats">
+  <div class="card">
+    <div class="card-title">📊 总览统计</div>
+    <div class="stat-grid-4">
+      <div class="stat-item"><div class="stat-num" id="st-sessions">0</div><div class="stat-label">总监测</div></div>
+      <div class="stat-item"><div class="stat-num" id="st-frames">0</div><div class="stat-label">总帧数</div></div>
+      <div class="stat-item"><div class="stat-num" id="st-alerts" style="color:var(--danger)">0</div><div class="stat-label">总告警</div></div>
+      <div class="stat-item"><div class="stat-num" id="st-part" style="color:var(--safe)">0%</div><div class="stat-label">平均参与度</div></div>
+    </div>
+  </div>
+  <div id="scene-stats-container"></div>
+  <div class="card">
+    <div class="card-title">📋 最近10条记录</div>
+    <div id="stats-recent"></div>
+  </div>
+</div>
+
+<!-- ===== 历史记录 ===== -->
+<div class="page" id="page-history">
+  <div id="history-list"></div>
+</div>
+
+<!-- ===== 记录详情 ===== -->
+<div class="page" id="page-detail">
+  <div class="back-btn" onclick="showPage('history')">← 返回列表</div>
+  <div class="card" id="detail-card"></div>
+  <div class="card" id="detail-action-card" style="display:none">
+    <div class="card-title">🏃 运动动作分布</div>
+    <div id="detail-action-list"></div>
+  </div>
+  <div class="card" id="detail-behavior-card" style="display:none">
+    <div class="card-title">👤 行为分布</div>
+    <div id="detail-behavior-list"></div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <div class="tab active" onclick="showPage('home')"><div class="tab-icon">🏠</div><div class="tab-label">首页</div></div>
+  <div class="tab" onclick="showPage('realtime')"><div class="tab-icon">📹</div><div class="tab-label">实时</div></div>
+  <div class="tab" onclick="showPage('video')"><div class="tab-icon">🎬</div><div class="tab-label">视频</div></div>
+  <div class="tab" onclick="showPage('stats')"><div class="tab-icon">📈</div><div class="tab-label">统计</div></div>
+  <div class="tab" onclick="showPage('history')"><div class="tab-icon">📋</div><div class="tab-label">记录</div></div>
+</div>
+
+</div><!-- /app-main -->
+
+<script>
+let curScene='campus', sceneCfg={}, rtBP=true, vidBP=true;
+let selFile=null, curTask=null, pollT=null, vidAnalyzing=false, vidProgPct=0;
+let rtStream=null, rtWs=null, rtFacing='user', rtRunning=false;
+
+// ===== 用户认证 =====
+let authToken = localStorage.getItem('auth_token') || '';
+let curUser = null;
+
+function authHeaders() {
+  return authToken ? {'Authorization': 'Bearer ' + authToken} : {};
+}
+
+function authUrl(url) {
+  if (!authToken) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return url + sep + 'token=' + encodeURIComponent(authToken);
+}
+
+async function checkAuth() {
+  if (!authToken) { showAuthPage(); return false; }
+  try {
+    const r = await fetch('/api/auth/me', {headers: authHeaders()});
+    if (r.ok) {
+      const d = await r.json();
+      curUser = d.user;
+      showApp();
+      return true;
+    } else {
+      authToken = '';
+      localStorage.removeItem('auth_token');
+      showAuthPage();
+      return false;
+    }
+  } catch(e) {
+    showAuthPage();
+    return false;
+  }
+}
+
+function showAuthPage() {
+  document.getElementById('auth-page').style.display = 'flex';
+  document.getElementById('app-main').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('app-main').style.display = 'block';
+  // 更新用户信息
+  if (curUser) {
+    document.getElementById('user-name').textContent = curUser.display_name || curUser.username;
+    document.getElementById('user-avatar').textContent = (curUser.display_name || curUser.username)[0].toUpperCase();
+  }
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  if (tab === 'login') {
+    document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    document.getElementById('form-login').classList.add('active');
+  } else {
+    document.querySelectorAll('.auth-tab')[1].classList.add('active');
+    document.getElementById('form-register').classList.add('active');
+  }
+}
+
+async function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-err');
+  errEl.textContent = '';
+  if (!user || !pass) { errEl.textContent = '请填写用户名和密码'; return; }
+  try {
+    const r = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: user, password: pass})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      authToken = d.token;
+      curUser = d.user;
+      localStorage.setItem('auth_token', authToken);
+      showApp();
+      init();
+    } else {
+      errEl.textContent = d.detail || '登录失败';
+    }
+  } catch(e) { errEl.textContent = '网络错误: ' + e.message; }
+}
+
+async function doRegister() {
+  const user = document.getElementById('reg-user').value.trim();
+  const name = document.getElementById('reg-name').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-err');
+  errEl.textContent = '';
+  if (!user || !pass) { errEl.textContent = '请填写用户名和密码'; return; }
+  try {
+    const r = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: user, password: pass, display_name: name})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      authToken = d.token;
+      curUser = d.user;
+      localStorage.setItem('auth_token', authToken);
+      showApp();
+      init();
+    } else {
+      errEl.textContent = d.detail || '注册失败';
+    }
+  } catch(e) { errEl.textContent = '网络错误: ' + e.message; }
+}
+
+async function doLogout() {
+  try {
+    await fetch('/api/auth/logout', {method: 'POST', headers: authHeaders()});
+  } catch(e) {}
+  authToken = '';
+  curUser = null;
+  localStorage.removeItem('auth_token');
+  showAuthPage();
+}
+
+function showLogoutMenu() {
+  if (confirm('确认退出登录？')) doLogout();
+}
+
+// 回车提交
+document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('reg-pass').addEventListener('keydown', e => { if(e.key==='Enter') doRegister(); });
+
+// ===== 场景配置（前端本地，用于差异化展示）=====
+const SCENE_DATA={
+  campus:{
+    name:'校园体育',icon:'🎓',color:'#4facfe',color2:'#00f2fe',
+    desc:'课堂质量监测 · 学生安全防护',
+    features:[
+      {icon:'👥',name:'到课统计',desc:'自动统计人数'},
+      {icon:'📊',name:'课堂参与度',desc:'运动+站立占比'},
+      {icon:'⚠️',name:'运动安全告警',desc:'弯腰/膝盖风险'},
+      {icon:'✋',name:'课堂行为识别',desc:'举手/蹲下/懒散'},
+    ],
+    labels:{count:'到课人数',part:'课堂参与度',state:'课堂状态',action:'运动动作',behavior:'课堂行为'},
+  },
+  fitness:{
+    name:'健身训练',icon:'💪',color:'#ff9f43',color2:'#ff7847',
+    desc:'动作标准分析 · 训练效果评估',
+    features:[
+      {icon:'🏋️',name:'动作识别',desc:'深蹲/开合跳/高抬腿'},
+      {icon:'📐',name:'姿势纠正',desc:'关节角度检测'},
+      {icon:'⚡',name:'训练强度',desc:'运动频率统计'},
+      {icon:'🔢',name:'训练计数',desc:'自动动作计数'},
+    ],
+    labels:{count:'训练人数',part:'训练活跃度',state:'训练状态',action:'训练动作',behavior:'训练姿态'},
+  },
+  rehab:{
+    name:'康复训练',icon:'🏥',color:'#00d8a0',color2:'#00b894',
+    desc:'活动范围监测 · 恢复进度追踪',
+    features:[
+      {icon:'🦵',name:'关节活动度',desc:'膝关节角度监测'},
+      {icon:'📏',name:'动作范围',desc:'屈伸幅度检测'},
+      {icon:'🐢',name:'温和提示',desc:'过度运动提醒'},
+      {icon:'📈',name:'恢复评估',desc:'活动能力趋势'},
+    ],
+    labels:{count:'训练人数',part:'活动完成度',state:'康复状态',action:'康复动作',behavior:'康复姿态'},
+  },
+  general:{
+    name:'通用模式',icon:'⚡',color:'#a855f7',color2:'#7c3aed',
+    desc:'全功能检测 · 多场景适配',
+    features:[
+      {icon:'🎯',name:'全部检测项',desc:'风险+行为+动作'},
+      {icon:'👥',name:'多人检测',desc:'YOLOv8全员覆盖'},
+      {icon:'🔬',name:'精细分析',desc:'BlazePose 33点'},
+      {icon:'📊',name:'数据导出',desc:'统计报表生成'},
+    ],
+    labels:{count:'检测人数',part:'活动参与度',state:'检测状态',action:'运动动作',behavior:'行为姿态'},
+  },
+};
+
+async function init(){
+  try{
+    const res=await fetch('/api/scenes'); sceneCfg=await res.json();
+  }catch(e){ sceneCfg=SCENE_DATA; }
+  renderSceneBar();
+  selectScene('campus');
+  loadStats(); loadHistory();
+  // 加载公网地址
+  try{
+    const r=await fetch('/api/public-url'); const d=await r.json();
+    if(d.has_public){
+      document.getElementById('qr-img').src='/api/qrcode?t='+Date.now();
+      document.getElementById('pub-url').textContent=d.public_url;
+      document.getElementById('qr-card').style.display='block';
+    }
+  }catch(e){}
+}
+
+function renderSceneBar(){
+  const bar=document.getElementById('scene-bar'); bar.innerHTML='';
+  for(const[key,cfg] of Object.entries(SCENE_DATA)){
+    const b=document.createElement('div');
+    b.className='scene-btn'+(key===curScene?' active':'');
+    b.textContent=cfg.icon+' '+cfg.name;
+    b.onclick=()=>selectScene(key);
+    bar.appendChild(b);
+  }
+}
+
+function selectScene(key){
+  curScene=key; const cfg=SCENE_DATA[key];
+  document.querySelectorAll('.scene-btn').forEach((b,i)=>{
+    b.classList.toggle('active',Object.keys(SCENE_DATA)[i]===key);
+  });
+  document.getElementById('app-title').textContent=cfg.icon+' '+cfg.name+'监测';
+  document.getElementById('app-sub').textContent=cfg.desc;
+  document.documentElement.style.setProperty('--p',cfg.color);
+  document.documentElement.style.setProperty('--p2',cfg.color2);
+  // 更新特色卡片
+  document.getElementById('feat-title').textContent='🎯 '+cfg.name+' · 检测能力';
+  const fg=document.getElementById('feat-grid'); fg.innerHTML='';
+  cfg.features.forEach(f=>{
+    fg.innerHTML+=`<div class="feat-card"><div class="feat-icon">${f.icon}</div><div class="feat-name">${f.name}</div><div class="feat-desc">${f.desc}</div></div>`;
+  });
+  // 更新场景检测重点提示
+  updateSceneInfo();
+}
+
+function updateSceneInfo(){
+  const cfg=SCENE_DATA[curScene];
+  // 更新实时监测页的检测重点
+  const rtInfo=document.getElementById('rt-scene-info');
+  if(rtInfo){
+    rtInfo.innerHTML=`<div style="font-size:12px;color:var(--sub);line-height:1.6">
+      <b style="color:${cfg.color}">${cfg.icon} ${cfg.name}模式</b><br>
+      <span>检测重点：${cfg.features.map(f=>f.name).join('、')}</span>
+    </div>`;
+  }
+  // 更新视频分析页的检测重点
+  const vidInfo2=document.getElementById('vid-scene-info');
+  if(vidInfo2){
+    vidInfo2.innerHTML=`<div style="font-size:12px;color:var(--sub);line-height:1.6">
+      <b style="color:${cfg.color}">${cfg.icon} ${cfg.name}模式</b><br>
+      <span>检测重点：${cfg.features.map(f=>f.name).join('、')}</span>
+    </div>`;
+  }
+  // 更新实时面板的场景标签和指标名称
+  updateRealtimeLabels();
+}
+
+function updateRealtimeLabels(){
+  const cfg=SCENE_DATA[curScene];
+  const tag=document.getElementById('rt-scene-tag');
+  if(tag) tag.textContent='· '+cfg.name;
+
+  // 场景差异化标签
+  const labelMap={
+    campus:{moving:'运动中',standing:'站立中',still:'静止',peak:'到课峰值',action:'动作',behavior:'课堂行为'},
+    fitness:{moving:'活跃中',standing:'准备中',still:'休息中',peak:'训练人数',action:'训练动作',behavior:'训练姿态'},
+    rehab:{moving:'活动中',standing:'准备中',still:'静养中',peak:'训练人数',action:'康复动作',behavior:'康复姿态'},
+    general:{moving:'运动中',standing:'站立中',still:'静止',peak:'峰值人数',action:'运动动作',behavior:'行为姿态'},
+  };
+  const lm=labelMap[curScene]||labelMap.general;
+  const set=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
+  set('rt-l-moving',lm.moving); set('rt-l-standing',lm.standing);
+  set('rt-l-still',lm.still); set('rt-l-peak',lm.peak);
+  set('rt-l-action',lm.action); set('rt-l-behavior',lm.behavior);
+
+  // 场景差异化显示/隐藏动作和行为行
+  const actionRow=document.getElementById('rt-action-row');
+  const behaviorRow=document.getElementById('rt-behavior-row');
+  if(curScene==='campus'){
+    if(actionRow)actionRow.style.display='none';     // 校园不显示动作
+    if(behaviorRow)behaviorRow.style.display='block'; // 校园显示行为
+  }else if(curScene==='fitness'||curScene==='rehab'){
+    if(actionRow)actionRow.style.display='block';    // 健身/康复显示动作
+    if(behaviorRow)behaviorRow.style.display='none'; // 健身/康复不显示行为
+  }else{
+    if(actionRow)actionRow.style.display='block';
+    if(behaviorRow)behaviorRow.style.display='block';
+  }
+
+  // 场景专属指标区域
+  const extra=document.getElementById('rt-extra-metrics');
+  if(extra){
+    if(curScene==='fitness'){
+      extra.style.display='block';
+      extra.innerHTML='📐 姿势纠正: <span id="rt-form" style="color:var(--text);font-weight:600">--</span>';
+    }else if(curScene==='rehab'){
+      extra.style.display='block';
+      extra.innerHTML='🦵 关节活动度: <span id="rt-rom" style="color:var(--text);font-weight:600">--</span>';
+    }else{
+      extra.style.display='none';
+    }
+  }
+}
+
+// ===== 统计 =====
+async function loadStats(){
+  try{
+    const r=await fetch('/api/stats', {headers: authHeaders()}); const d=await r.json();
+    // 首页概览
+    document.getElementById('s-sessions').textContent=d.total_sessions;
+    document.getElementById('s-frames').textContent=d.total_frames;
+    document.getElementById('s-alerts').textContent=d.total_alerts;
+    document.getElementById('s-part').textContent=Math.round((d.avg_participation||0)*100)+'%';
+    // 统计页总览
+    document.getElementById('st-sessions').textContent=d.total_sessions;
+    document.getElementById('st-frames').textContent=d.total_frames;
+    document.getElementById('st-alerts').textContent=d.total_alerts;
+    document.getElementById('st-part').textContent=Math.round((d.avg_participation||0)*100)+'%';
+    // 分场景统计
+    renderSceneStats(d.scenes||{});
+  }catch(e){}
+}
+
+function renderSceneStats(scenes){
+  const container=document.getElementById('scene-stats-container');
+  if(!container) return;
+  const keys=Object.keys(scenes);
+  if(keys.length===0){
+    container.innerHTML='<div class="card"><div class="empty">暂无分场景数据，开始监测后这里会显示各模式独立统计</div></div>';
+    return;
+  }
+  let html='';
+  for(const key of keys){
+    const s=scenes[key];
+    const cfg=SCENE_DATA[key]||{name:key,icon:'📊',color:'#888',color2:'#666'};
+    const partPct=Math.round((s.avg_participation||0)*100);
+    const partColor=partPct>=70?'var(--safe)':partPct>=40?'var(--warn)':'var(--danger)';
+    html+=`
+    <div class="card" style="border-left:4px solid ${cfg.color}">
+      <div class="card-title" style="color:${cfg.color}">
+        ${cfg.icon} ${cfg.name}
+        <span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:auto">${s.sessions}次监测</span>
+      </div>
+      <div class="stat-grid-4">
+        <div class="stat-item"><div class="stat-num sm">${s.sessions}</div><div class="stat-label">监测次数</div></div>
+        <div class="stat-item"><div class="stat-num sm">${s.total_frames}</div><div class="stat-label">处理帧数</div></div>
+        <div class="stat-item"><div class="stat-num sm" style="color:var(--danger)">${s.total_alerts}</div><div class="stat-label">风险告警</div></div>
+        <div class="stat-item"><div class="stat-num sm" style="color:${partColor}">${partPct}%</div><div class="stat-label">平均参与度</div></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--sub)">
+        <span>平均人数: <b style="color:var(--text)">${s.avg_persons||0}</b></span>
+        <span>峰值人数: <b style="color:var(--text)">${s.peak_persons||0}</b></span>
+        <span>总帧数: <b style="color:var(--text)">${s.total_frames||0}</b></span>
+      </div>
+    </div>`;
+  }
+  container.innerHTML=html;
+}
+
+// ===== 实时监测 =====
+async function startRealtime(){
+  // 检查浏览器是否支持摄像头 API
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('当前浏览器不支持摄像头访问\n\n可能原因：\n· 通过 HTTP + IP地址 访问（非localhost）\n· 浏览器版本过旧\n\n解决方案：\n· 用 http://127.0.0.1:端口 本机访问\n· 或让服务端加 --https 参数启动后用 https:// 访问');
+    return;
+  }
+  // 检查安全上下文（HTTPS 或 localhost）
+  if(!window.isSecureContext){
+    const host=location.hostname;
+    if(host!=='127.0.0.1'&&host!=='localhost'){
+      alert('摄像头需要安全上下文（HTTPS 或 localhost）\n\n当前地址: '+location.href+'\n\n解决方案（任选其一）：\n1. 本机访问: http://127.0.0.1:'+location.port+'\n2. 让服务端加 --https 参数启动，然后用 https:// 访问\n3. 服务端加 --tunnel cloudflare 获取公网HTTPS地址');
+      return;
+    }
+  }
+
+  let stream;
+  try{
+    // 尝试获取摄像头，桌面端先不加facingMode约束（兼容性更好）
+    const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(isMobile){
+      // 手机端：指定前后摄像头
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:rtFacing,width:{ideal:640},height:{ideal:480}},
+          audio:false
+        });
+      }catch(e1){
+        stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      }
+    }else{
+      // 桌面端：直接请求摄像头，不加facingMode（桌面摄像头不支持该约束）
+      stream=await navigator.mediaDevices.getUserMedia({
+        video:{width:{ideal:640},height:{ideal:480}},
+        audio:false
+      });
+    }
+    rtStream=stream;
+  }catch(e){
+    let hint='无法访问摄像头';
+    if(e.name==='NotAllowedError') hint='摄像头权限被拒绝\n\n请在浏览器地址栏点击锁/摄像头图标，允许摄像头权限后刷新页面';
+    else if(e.name==='NotFoundError') hint='未找到摄像头设备\n\n请检查摄像头是否已连接';
+    else if(e.name==='NotReadableError') hint='摄像头被其他程序占用\n\n请关闭其他使用摄像头的程序（如Zoom/微信/其他浏览器标签）后重试';
+    else if(e.name==='OverconstrainedError') hint='摄像头不满足约束条件\n\n尝试刷新页面重试';
+    else hint='摄像头错误: '+e.message;
+    alert(hint);
+    return;
+  }
+  const video=document.getElementById('rt-video');
+  video.srcObject=rtStream;
+  await video.play();
+
+  document.getElementById('rt-start-btn').style.display='none';
+  document.getElementById('rt-badge').style.display='block';
+  document.getElementById('rt-panel').style.display='block';
+  document.getElementById('rt-overlay').style.display='block';
+  document.getElementById('rt-controls').innerHTML=
+    '<button class="rt-btn rt-stop" onclick="stopRealtime()">⏹ 停止监测</button>';
+
+  rtRunning=true;
+  // 建立 WebSocket（协议跟随页面：HTTPS→wss, HTTP→ws）
+  const proto=location.protocol==='https:'?'wss':'ws';
+  const wsUrl=proto+'://'+location.host+'/ws/realtime?token='+encodeURIComponent(authToken);
+  console.log('[WebSocket] 连接:', wsUrl.replace(/token=[^&]+/,'token=***'));
+  try{
+    rtWs=new WebSocket(wsUrl);
+  }catch(e){
+    alert('WebSocket创建失败：'+e.message+'\n\n可能原因：\n· 浏览器不支持WebSocket\n· URL格式错误');
+    stopRealtime();
+    return;
+  }
+  rtWs.onopen=()=>{ console.log('[WebSocket] 已连接'); sendFrames(); };
+  rtWs.onmessage=onRealtimeResult;
+  rtWs.onerror=(ev)=>{
+    console.error('[WebSocket] 错误:', ev);
+    let hint='WebSocket连接失败\n\n可能原因：\n';
+    if(location.protocol==='https:'&&proto==='ws'){
+      hint+='· HTTPS页面不能连接ws://（混合内容被拦截）\n  → 服务端需启用--https，用wss://连接\n';
+    }else if(!authToken){
+      hint+='· 未登录或登录已过期，请重新登录\n';
+    }else{
+      hint+='· 服务端可能未启动WebSocket支持\n  → 请确保已安装 websockets 库\n· 或登录token已失效，请刷新页面重新登录\n';
+    }
+    alert(hint);
+    stopRealtime();
+  };
+  rtWs.onclose=(ev)=>{
+    console.log('[WebSocket] 关闭 code='+ev.code+' reason='+ev.reason);
+    rtRunning=false;
+    if(ev.code===1008||ev.code===4001){
+      // 认证失败
+      alert('WebSocket认证失败：'+(ev.reason||'token无效或已过期')+'\n\n请刷新页面重新登录');
+    }
+  };
+}
+
+let rtSendTimer=null, rtSending=false;
+function sendFrames(){
+  const video=document.getElementById('rt-video');
+  const canvas=document.getElementById('rt-canvas');
+  const ctx=canvas.getContext('2d');
+  // 自适应发送：上一帧处理完才发下一帧，避免堆积
+  function sendOne(){
+    if(!rtRunning||!rtWs||rtWs.readyState!==1){ rtSendTimer=setTimeout(sendOne,200); return; }
+    if(rtSending){ rtSendTimer=setTimeout(sendOne,100); return; }
+    rtSending=true;
+    canvas.width=320; canvas.height=240;
+    ctx.drawImage(video,0,0,320,240);
+    const data=canvas.toDataURL('image/jpeg',0.6);
+    rtWs.send(JSON.stringify({type:'frame',data:data,use_bp:rtBP,scene:curScene}));
+    // 等待结果回来后再发下一帧，间隔250ms保底
+    rtSendTimer=setTimeout(sendOne,200);
+  }
+  sendOne();
+}
+
+function onRealtimeResult(ev){
+  rtSending=false; // 收到结果，允许发下一帧
+  let d; try{d=JSON.parse(ev.data)}catch(e){return}
+  if(d.type==='error'){ alert(d.message||'连接错误'); stopRealtime(); return; }
+  if(d.type!=='result')return;
+  // 显示标注帧
+  document.getElementById('rt-overlay').src=d.frame;
+  const s=d.stats, c=d.cumulative;
+  document.getElementById('rt-total').textContent=s.total;
+  document.getElementById('rt-fps').textContent=s.fps;
+  document.getElementById('rt-part').textContent=Math.round(Math.min(1,Math.max(0,s.participation||0))*100)+'%';
+  document.getElementById('rt-alerts').textContent=s.alerts;
+  document.getElementById('rt-dur').textContent=c.duration+'s';
+  document.getElementById('rt-moving').textContent=s.moving;
+  document.getElementById('rt-standing').textContent=s.standing;
+  document.getElementById('rt-still').textContent=s.still;
+  document.getElementById('rt-peak').textContent=c.peak_persons;
+  document.getElementById('rt-actions').textContent=(s.cur_actions||[]).join('、')||'无';
+  document.getElementById('rt-behaviors').textContent=(s.cur_behaviors||[]).join('、')||'无';
+  // 场景专属指标
+  const sm=s.scene_metrics||{};
+  if(sm.form&&sm.form.length>0){
+    const f=sm.form[0];
+    const el=document.getElementById('rt-form');
+    if(el) el.textContent=`躯干${f.trunk_ang}° 膝${f.knee_ang_min}°`;
+  }
+  if(sm.rom&&sm.rom.length>0){
+    const r=sm.rom[0];
+    const el=document.getElementById('rt-rom');
+    if(el) el.textContent=`躯干${r.trunk_ang}° 膝${r.knee_ang_min}°`;
+  }
+}
+
+function stopRealtime(){
+  rtRunning=false;
+  if(rtSendTimer)clearTimeout(rtSendTimer);
+  rtSending=false;
+  if(rtWs){rtWs.close();rtWs=null;}
+  if(rtStream){rtStream.getTracks().forEach(t=>t.stop());rtStream=null;}
+  document.getElementById('rt-video').srcObject=null;
+  document.getElementById('rt-overlay').style.display='none';
+  document.getElementById('rt-badge').style.display='none';
+  document.getElementById('rt-panel').style.display='none';
+  document.getElementById('rt-controls').innerHTML=
+    '<button class="rt-btn rt-live" onclick="startRealtime()">📹 开始实时监测</button>';
+  loadStats();
+}
+
+async function toggleCamera(){
+  rtFacing=rtFacing==='user'?'environment':'user';
+  document.getElementById('rt-cam-sw').classList.toggle('on',rtFacing==='environment');
+  // 如果正在监测，无缝切换摄像头（不停止WebSocket）
+  if(rtRunning && rtStream){
+    // 先释放旧摄像头
+    rtStream.getTracks().forEach(t=>t.stop());
+    rtStream=null;
+    try{
+      const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+      const stream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:rtFacing,width:{ideal:640},height:{ideal:480}},
+        audio:false
+      });
+      rtStream=stream;
+      document.getElementById('rt-video').srcObject=stream;
+      console.log('[摄像头] 已切换到', rtFacing==='user'?'前置':'后置');
+    }catch(e){
+      // 切换失败，回退到默认
+      try{
+        const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+        rtStream=stream;
+        document.getElementById('rt-video').srcObject=stream;
+      }catch(e2){
+        alert('切换摄像头失败: '+e2.message);
+        stopRealtime();
+      }
+    }
+  }
+}
+
+// ===== 视频分析 =====
+function onVideoSelected(input){
+  const f=input.files[0]; if(!f)return;
+  selFile=f;
+  const mb=(f.size/1024/1024).toFixed(1);
+  document.getElementById('vid-info').style.display='block';
+  document.getElementById('vid-info').innerHTML=`✅ <b>${f.name}</b><br>大小: ${mb}MB · ${f.type||'未知'}`;
+  document.getElementById('vid-start').disabled=false;
+}
+
+async function startVideoAnalysis(){
+  if(!selFile)return;
+  document.getElementById('vid-start').disabled=true;
+  document.getElementById('vid-prog-card').style.display='block';
+  document.getElementById('vid-prog-fill').style.width='0%';
+  document.getElementById('vid-prog-text').textContent='上传中...';
+  vidAnalyzing=true; vidProgPct=0;
+  updateBgIndicator();
+  const fd=new FormData(); fd.append('file',selFile);
+  try{
+    const r=await fetch(`/api/analyze?use_blazepose=${vidBP}&scene=${curScene}`,{method:'POST',body:fd,headers:authHeaders()});
+    const d=await r.json();
+    if(d.task_id){curTask=d.task_id;pollVideo(d.task_id);}
+    else{alert('上传失败: '+(d.detail||'未知'));showPage('video'); vidAnalyzing=false; updateBgIndicator();}
+  }catch(e){alert('上传失败: '+e.message);showPage('video'); vidAnalyzing=false; updateBgIndicator();}
+}
+
+function pollVideo(tid){
+  if(pollT)clearInterval(pollT);
+  pollT=setInterval(async()=>{
+    try{
+      const r=await fetch(`/api/task/${tid}`, {headers: authHeaders()}); const d=await r.json();
+      vidProgPct=d.progress||0;
+      // 更新进度条（即使不在视频页也更新DOM，切回来能看到）
+      const fill=document.getElementById('vid-prog-fill');
+      const txt=document.getElementById('vid-prog-text');
+      const det=document.getElementById('vid-prog-detail');
+      const st=document.getElementById('vid-prog-status');
+      if(fill)fill.style.width=d.progress+'%';
+      if(txt)txt.textContent=d.progress+'%';
+      if(d.total_frames>0&&det)det.textContent=`${d.processed_frames}/${d.total_frames}帧`;
+      if(st){
+        if(d.status==='encoding')st.textContent='编码中';
+        else if(d.status==='completed')st.textContent='已完成';
+        else st.textContent='处理中';
+      }
+      updateBgIndicator();
+      if(d.status==='encoding'){
+        if(txt)txt.textContent='编码中...';
+        if(det)det.textContent='正在转换为浏览器兼容格式(H.264)';
+      }
+      if(d.status==='completed'){
+        clearInterval(pollT);pollT=null;
+        vidAnalyzing=false; updateBgIndicator();
+        showVideoResult(d);
+      }
+      else if(d.status==='failed'){
+        clearInterval(pollT);pollT=null;
+        vidAnalyzing=false; updateBgIndicator();
+        alert('分析失败: '+(d.error||''));showPage('video');
+      }
+    }catch(e){}
+  },1500);
+}
+
+// 更新底部导航栏的后台分析指示器
+function updateBgIndicator(){
+  const videoTab=document.querySelectorAll('.tab')[2];
+  if(!videoTab)return;
+  if(vidAnalyzing){
+    videoTab.innerHTML=`<div class="tab-icon" style="position:relative">🎬<span style="position:absolute;top:-4px;right:-8px;background:var(--warn);color:#fff;font-size:8px;padding:1px 4px;border-radius:8px;font-weight:700;min-width:16px;text-align:center">${vidProgPct|0}%</span></div><div class="tab-label">分析中</div>`;
+  }else{
+    videoTab.innerHTML='<div class="tab-icon">🎬</div><div class="tab-label">视频</div>';
+  }
+}
+
+function showVideoResult(data){
+  showPage('result');
+  const r=data.result, cfg=SCENE_DATA[curScene];
+  // 场景差异化标签
+  const riskLabel={campus:'安全告警',fitness:'姿势风险',rehab:'温和提示',general:'风险告警'}[curScene]||'风险告警';
+  const items=[
+    {n:r.peak_persons,l:cfg.labels.count,c:cfg.color},
+    {n:Math.round(Math.min(1,Math.max(0,r.participation||0))*100)+'%',l:cfg.labels.part,c:'#00d8a0'},
+    {n:r.risk_alerts,l:riskLabel,c:'#ff4757'},
+    {n:r.blaze_confirm,l:'精细确认',c:'#a855f7'},
+    {n:r.total_frames,l:'总帧数',c:'#ff9f43'},
+    {n:r.avg_fps,l:'平均FPS',c:'#7c3aed'},
+    {n:r.avg_persons,l:'平均人数/帧',c:'#00b894'},
+    {n:r.duration_sec+'s',l:'耗时',c:'#fd79a8'},
+  ];
+  document.getElementById('result-grid').innerHTML=items.map(i=>
+    `<div class="stat-item"><div class="stat-num sm" style="color:${i.c}">${i.n}</div><div class="stat-label">${i.l}</div></div>`
+  ).join('');
+  document.getElementById('result-video').src=authUrl(`/api/task/${curTask}/video`);
+  document.getElementById('result-video-card').style.display='block';
+  // 场景差异化：动作分布仅健身/康复/通用显示，行为分布仅校园/通用显示
+  if(curScene==='fitness'||curScene==='rehab'||curScene==='general'){
+    renderDist(r.action_dist,'result-action-card','result-action-list');
+  }else{
+    document.getElementById('result-action-card').style.display='none';
+  }
+  if(curScene==='campus'||curScene==='general'){
+    renderDist(r.behavior_dist,'result-behavior-card','result-behavior-list');
+  }else{
+    document.getElementById('result-behavior-card').style.display='none';
+  }
+  selFile=null;
+  document.getElementById('vid-input').value='';
+  document.getElementById('vid-info').style.display='none';
+  document.getElementById('vid-start').disabled=true;
+  loadStats();
+}
+
+function renderDist(dist,cardId,listId){
+  const es=Object.entries(dist||{}).sort((a,b)=>b[1]-a[1]);
+  const card=document.getElementById(cardId),list=document.getElementById(listId);
+  if(es.length===0){card.style.display='none';return;}
+  card.style.display='block';
+  const mx=Math.max(...es.map(e=>e[1]),1);
+  list.innerHTML=es.map(([n,c])=>
+    `<div class="dist-item"><span>${n}</span><div class="dist-bar"><div class="dist-fill" style="width:${c/mx*100}%"></div></div><b>${c}</b></div>`
+  ).join('');
+}
+
+// ===== 历史记录 =====
+async function loadHistory(){
+  try{
+    const r=await fetch('/api/records?limit=50', {headers: authHeaders()}); const d=await r.json();
+    const list=document.getElementById('history-list');
+    const stList=document.getElementById('stats-recent');
+    if(d.count===0){
+      list.innerHTML='<div class="empty"><div style="font-size:48px;opacity:.2">📋</div>暂无监测记录</div>';
+      if(stList)stList.innerHTML='<div class="empty">暂无数据</div>';
+      return;
+    }
+    const html=d.records.map(r=>`
+      <div class="rec-item" onclick="showDetail(${r.id})">
+        <div class="rec-top">
+          <span class="rec-time">${r.timestamp}</span>
+          <span class="rec-tag">${SCENE_DATA[r.scene]?.name||r.scene}</span>
+        </div>
+        <div style="font-size:12px;margin-bottom:3px">${r.source||r.mode}</div>
+        <div class="rec-stats">
+          <span>人数<b>${r.peak_persons}</b></span>
+          <span>参与度<b>${Math.round(Math.min(1,Math.max(0,r.participation||0))*100)}%</b></span>
+          <span>告警<b>${r.risk_alerts}</b>${r.risk_alerts>0?'<span class="badge">!</span>':''}</span>
+        </div>
+      </div>`).join('');
+    list.innerHTML=html;
+    if(stList)stList.innerHTML=html;
+  }catch(e){}
+}
+
+async function showDetail(id){
+  showPage('detail');
+  try{
+    const r=await fetch(`/api/records/${id}`, {headers: authHeaders()}); const d=await r.json();
+    const cfg=SCENE_DATA[d.scene]||SCENE_DATA.campus;
+    document.getElementById('detail-card').innerHTML=`
+      <div class="card-title">📊 记录 #${d.id}</div>
+      <div class="detail-row"><span style="color:var(--sub)">时间</span><b>${d.timestamp}</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">场景</span><b>${cfg.icon} ${cfg.name}</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">来源</span><b>${d.source}</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">模式</span><b>${d.mode}</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">时长</span><b>${d.duration_sec}秒</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">总帧数</span><b>${d.total_frames}</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">平均帧率</span><b>${d.avg_fps} FPS</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">${cfg.labels.count}</span><b>${d.peak_persons}人</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">平均人数</span><b>${d.avg_persons}人/帧</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">${cfg.labels.part}</span><b style="color:${cfg.color}">${Math.round(Math.min(1,Math.max(0,d.participation||0))*100)}%</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">风险告警</span><b style="color:#ff4757">${d.risk_alerts}次</b></div>
+      <div class="detail-row"><span style="color:var(--sub)">精细确认</span><b>${d.blaze_confirm}次</b></div>`;
+    // 场景差异化：动作分布仅健身/康复/通用显示，行为分布仅校园/通用显示
+    if(d.scene==='fitness'||d.scene==='rehab'||d.scene==='general'){
+      renderDist(d.action_dist,'detail-action-card','detail-action-list');
+    }else{
+      document.getElementById('detail-action-card').style.display='none';
+    }
+    if(d.scene==='campus'||d.scene==='general'){
+      renderDist(d.behavior_dist,'detail-behavior-card','detail-behavior-list');
+    }else{
+      document.getElementById('detail-behavior-card').style.display='none';
+    }
+  }catch(e){document.getElementById('detail-card').innerHTML='<div class="empty">加载失败</div>';}
+}
+
+// ===== 页面切换 =====
+function showPage(name){
+  // 视频分析结果页不算导航tab
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pageEl=document.getElementById('page-'+name);
+  if(pageEl)pageEl.classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  const tabs=['home','realtime','video','stats','history'];
+  const idx=tabs.indexOf(name);
+  if(idx>=0&&idx<5)document.querySelectorAll('.tab')[idx]?.classList.add('active');
+  if(name==='home')loadStats();
+  if(name==='history'||name==='stats')loadHistory();
+  // 切到视频页时，如果正在后台分析，确保进度卡片可见
+  if(name==='video'&&vidAnalyzing){
+    const pc=document.getElementById('vid-prog-card');
+    if(pc)pc.style.display='block';
+  }
+}
+
+// 页面启动：先检查登录状态
+checkAuth().then(ok => { if(ok) init(); });
+</script>
+</body>
+</html>
